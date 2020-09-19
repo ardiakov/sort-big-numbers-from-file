@@ -8,7 +8,11 @@
 // Размер сортируемого массива
 #define PARTITION_DATA_SIZE PARTITION_LIMIT * 8
 
-void print_array(char array[]);
+// Метод сортировки данных
+void sort(long int data[]);
+
+// Метод записи отсортированных данных в файл
+void writeToFile(char name[]);
 
 int main() {
     FILE *file;
@@ -49,10 +53,3 @@ int main() {
 
     return 0;
 }
-
-void print_array(char array[]) {
-    for (int i = 0; i < 255; ++i) {
-        printf("%c", array[i]);
-    }
-}
-
