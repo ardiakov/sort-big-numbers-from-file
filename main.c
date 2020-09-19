@@ -1,8 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+// Кол-вл элементов для сортировки
+#define PARTITION_LIMIT 4
+
+// Размер сортируемого массива
+#define PARTITION_DATA_SIZE PARTITION_LIMIT * 8
 
 void print_array(char array[]);
-void jumpOnNextLine(FILE *file, int index);
 
 int main() {
     FILE *file;
@@ -16,40 +22,32 @@ int main() {
     }
 
     int symbol;
+    char number[255] = {0};
 
-    char number[255] = {};
+    // Массив для сортровки 625000 значений (5мб)
+    long int data[PARTITION_DATA_SIZE] = {0};
 
-    int bytePosition = 0;
-    int counter = 0;
-    while ((symbol = fgetc(file)) != EOF) {
-        if (symbol != ' ') {
-            number[counter] = (char) symbol;
-            ++bytePosition;
-            ++counter;
-            printf("Отступ: %d \n", counter);
+    int dataIndex = 0;
+    int numberIndex = 0;
 
+    while ((symbol = fgetc(file)) != EOF && dataIndex <= PARTITION_LIMIT) {
+        if (symbol != ' ' && symbol != '\n') {
+            number[numberIndex] = (char) symbol;
+            ++numberIndex;
         } else {
-            printf("Целое число: %lli \n", atoll(number));
-            printf("Отступ: %d \n", bytePosition);
+            data[dataIndex] = atoll(number);
 
-            counter = 0;
-
-            jumpOnNextLine(file, bytePosition);
-
-            printf("Новый символ: %c", fgetc(file));
-
-            exit(1);
+            memset(number, 0, numberIndex);
+            numberIndex = 0;
+            ++dataIndex;
         }
     }
 
+    for (int i = 0; i < PARTITION_LIMIT; ++i) {
+        printf("%d \n", data[i]);
+    }
 
     return 0;
-}
-
-void jumpOnNextLine(FILE *file, int index) {
-    if (fseek(file, index + 2,SEEK_SET) != 0) {
-        printf("Ошибка");
-    }
 }
 
 void print_array(char array[]) {
@@ -57,3 +55,4 @@ void print_array(char array[]) {
         printf("%c", array[i]);
     }
 }
+
