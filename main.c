@@ -5,18 +5,17 @@
 // Кол-вл элементов для сортировки
 #define PARTITION_LIMIT 4
 
-// Размер сортируемого массива
+// Размер сортируемого массива ( 8 байт в 1-ом лонг инт)
 #define PARTITION_DATA_SIZE PARTITION_LIMIT * 8
 
 // Метод сортировки данных
 void sort(long int data[]);
 
 // Метод записи отсортированных данных в файл
-void writeToFile(char name[]);
+void writeToFile(char name[], long int data[]);
 
 int main() {
     FILE *file;
-
     file = fopen("./simple.txt", "r");
 
     if (file == NULL) {
@@ -28,28 +27,86 @@ int main() {
     int symbol;
     char number[255] = {0};
 
-    // Массив для сортровки 625000 значений (5мб)
+    // Массив для сортировки
     long int data[PARTITION_DATA_SIZE] = {0};
 
     int dataIndex = 0;
     int numberIndex = 0;
+    int partitionIndex = 0;
 
-    while ((symbol = fgetc(file)) != EOF && dataIndex <= PARTITION_LIMIT) {
-        if (symbol != ' ' && symbol != '\n') {
-            number[numberIndex] = (char) symbol;
-            ++numberIndex;
-        } else {
-            data[dataIndex] = atoll(number);
+    while ((symbol = fgetc(file)) != EOF) {
+        if (partitionIndex < PARTITION_LIMIT) {
+            if (symbol != ' ' && symbol != '\n') {
+                number[numberIndex] = (char) symbol;
+                ++numberIndex;
+            } else {
+                data[partitionIndex] = atoll(number);
 
-            memset(number, 0, numberIndex);
-            numberIndex = 0;
-            ++dataIndex;
+                memset(number, 0, numberIndex);
+                numberIndex = 0;
+
+                ++dataIndex;
+                ++partitionIndex;
+            }
+
+            if (partitionIndex == PARTITION_LIMIT) {
+                // Сортировка порции данных
+                printf("Сортировка \n");
+                sort(data);
+
+                // Запись отсортированных данных в файл
+//                char fileNameWithPath[50] = {pwd};
+//                strcat (fileNameWithPath, dataIndex);
+//                snprintf(fileNameWithPath, 10, "%s%s%s", "./tmp/", dataIndex, ".txt");
+//
+                char fileNameWithPath[] = "./tmp/1.txt";
+
+//                for (int i = 0; i < 30; ++i) {
+//                    printf("%c", fileNameWithPath[i]);
+//                }
+
+                writeToFile(fileNameWithPath, data);
+                
+                memset(data, 0, partitionIndex * 8);
+                partitionIndex = 0;
+            }
+        }
+    }
+
+    fclose(file);
+
+    return 0;
+}
+
+void sort(long int data[]) {
+    for (int i = 1; i < PARTITION_LIMIT; ++i) {
+        int j = i;
+
+        while (j > 0 && data[j - 1] > data[j]) {
+            long int temp = data[j - 1];
+            data[j - 1] = data[j];
+            data[j] = temp;
+
+            j--;
         }
     }
 
     for (int i = 0; i < PARTITION_LIMIT; ++i) {
-        printf("%d \n", data[i]);
+        printf("%li \n", data[i]);
+    }
+}
+
+void writeToFile(char name[], long int data[]) {
+    FILE *fp;
+
+    fp = fopen(name, "w+, ccs=UTF-8");
+
+    int i = 0;
+    while (i < PARTITION_LIMIT) {
+        fprintf(fp, "%li\n", data[i]);
+
+        ++i;
     }
 
-    return 0;
+    fclose(fp);
 }
