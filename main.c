@@ -32,43 +32,41 @@ int main() {
 
     int dataIndex = 0;
     int numberIndex = 0;
-    int partitionIndex = 0;
+    int part = 0;
 
     while ((symbol = fgetc(file)) != EOF) {
-        if (partitionIndex < PARTITION_LIMIT) {
+        if (dataIndex < PARTITION_LIMIT) {
             if (symbol != ' ' && symbol != '\n') {
                 number[numberIndex] = (char) symbol;
                 ++numberIndex;
             } else {
-                data[partitionIndex] = atoll(number);
+                data[dataIndex] = atoll(number);
 
                 memset(number, 0, numberIndex);
                 numberIndex = 0;
 
                 ++dataIndex;
-                ++partitionIndex;
             }
 
-            if (partitionIndex == PARTITION_LIMIT) {
+            if (dataIndex == PARTITION_LIMIT) {
                 // Сортировка порции данных
                 printf("Сортировка \n");
                 sort(data);
 
                 // Запись отсортированных данных в файл
-//                char fileNameWithPath[50] = {pwd};
-//                strcat (fileNameWithPath, dataIndex);
-//                snprintf(fileNameWithPath, 10, "%s%s%s", "./tmp/", dataIndex, ".txt");
-//
-                char fileNameWithPath[] = "./tmp/1.txt";
+                char fileNameWithPath[50];
+                sprintf(fileNameWithPath, "./tmp/%d.txt", part);
 
-//                for (int i = 0; i < 30; ++i) {
-//                    printf("%c", fileNameWithPath[i]);
-//                }
+                // for (int i = 0; i < 30; ++i) {
+                //     printf("%c", fileNameWithPath[i]);
+                // }
 
                 writeToFile(fileNameWithPath, data);
                 
-                memset(data, 0, partitionIndex * 8);
-                partitionIndex = 0;
+                memset(data, 0, dataIndex * 8);
+
+                dataIndex = 0;
+                ++part;
             }
         }
     }
