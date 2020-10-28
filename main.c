@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Кол-вл элементов для сортировки
-#define PARTITION_LIMIT 4
+// Максимальное Кол-во разрядов у чисел
+#define RADIX_COUNT 2
 
 // Размер сортируемого массива ( 8 байт в 1-ом лонг инт)
 #define PARTITION_DATA_SIZE PARTITION_LIMIT * 8
@@ -24,51 +24,46 @@ int main() {
         return -1;
     }
 
+    char number[RADIX_COUNT];
     int symbol;
-    char number[255] = {0};
 
-    // Массив для сортировки
-    long int data[PARTITION_DATA_SIZE] = {0};
-
-    int dataIndex = 0;
-    int numberIndex = 0;
-    int part = 0;
+    int radix = 2;
+    int index = 0;
 
     while ((symbol = fgetc(file)) != EOF) {
-        if (dataIndex < PARTITION_LIMIT) {
-            if (symbol != ' ' && symbol != '\n') {
-                number[numberIndex] = (char) symbol;
-                ++numberIndex;
-            } else {
-                data[dataIndex] = atoll(number);
+        if (symbol == '\n') {
+            // Если количество знаков меньше чем максимальное количество разрядов, добавляем начальные нули
+            if (index < RADIX_COUNT) {
+                char temp[RADIX_COUNT];
+                for (int i = 0; i < index; i++) {
+                    temp[i] = number[i];
+                }
 
-                memset(number, 0, numberIndex);
-                numberIndex = 0;
+                memset(number, 0, RADIX_COUNT);
 
-                ++dataIndex;
+                int j;
+                for (j = 0; j < RADIX_COUNT - index; j++) {
+                    number[j] = '0';
+                }
+
+                for (int k = 0; k < index; k++) {
+                    number[j] = temp[k];
+                    j++;
+                }
             }
 
-            if (dataIndex == PARTITION_LIMIT) {
-                // Сортировка порции данных
-                printf("Сортировка \n");
-                sort(data);
+            int innerRadix = RADIX_COUNT - radix;
 
-                // Запись отсортированных данных в файл
-                char fileNameWithPath[50];
-                sprintf(fileNameWithPath, "./tmp/%d.txt", part);
+            printf("%c \n", number[innerRadix]);
 
-                // for (int i = 0; i < 30; ++i) {
-                //     printf("%c", fileNameWithPath[i]);
-                // }
+            memset(number, 0, RADIX_COUNT);
+            index = 0;
 
-                writeToFile(fileNameWithPath, data);
-                
-                memset(data, 0, dataIndex * 8);
-
-                dataIndex = 0;
-                ++part;
-            }
+            continue;
         }
+
+        number[index] = symbol;
+        index++;
     }
 
     fclose(file);
@@ -76,35 +71,17 @@ int main() {
     return 0;
 }
 
-void sort(long int data[]) {
-    for (int i = 1; i < PARTITION_LIMIT; ++i) {
-        int j = i;
-
-        while (j > 0 && data[j - 1] > data[j]) {
-            long int temp = data[j - 1];
-            data[j - 1] = data[j];
-            data[j] = temp;
-
-            j--;
-        }
-    }
-
-    for (int i = 0; i < PARTITION_LIMIT; ++i) {
-        printf("%li \n", data[i]);
-    }
-}
-
 void writeToFile(char name[], long int data[]) {
-    FILE *fp;
-
-    fp = fopen(name, "w+, ccs=UTF-8");
-
-    int i = 0;
-    while (i < PARTITION_LIMIT) {
-        fprintf(fp, "%li\n", data[i]);
-
-        ++i;
-    }
-
-    fclose(fp);
+//    FILE *fp;
+//
+//    fp = fopen(name, "w+, ccs=UTF-8");
+//
+//    int i = 0;
+//    while (i < PARTITION_LIMIT) {
+//        fprintf(fp, "%li\n", data[i]);
+//
+//        ++i;
+//    }
+//
+//    fclose(fp);
 }
