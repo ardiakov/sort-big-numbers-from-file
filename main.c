@@ -12,7 +12,7 @@
 void sort(long int data[]);
 
 // Метод записи отсортированных данных в файл
-void writeToFile(char name[], long int data[]);
+void writeToFile(int fileIndex, char data[]);
 
 // Метод инициализирует пустые списки для сортировки по разрядам
 void initFiles();
@@ -58,8 +58,16 @@ int main() {
             }
 
             int innerRadix = RADIX_COUNT - radix;
-            // Помещаем number в список number[innerRadix]
             printf("%c \n", number[innerRadix]);
+
+            // Запись числа в файл
+            char fileName[12];
+            sprintf(fileName, "./tmp/%d.txt", number[innerRadix]);
+            for (int l = 0; l < 12; ++l) {
+                printf("%d", fileName[l]);
+            }
+
+            writeToFile(fileName, number);
 
             memset(number, 0, RADIX_COUNT);
             index = 0;
@@ -87,17 +95,20 @@ void initFiles() {
     }
 }
 
-void writeToFile(char name[], long int data[]) {
-//    FILE *fp;
-//
-//    fp = fopen(name, "w+, ccs=UTF-8");
-//
-//    int i = 0;
-//    while (i < PARTITION_LIMIT) {
-//        fprintf(fp, "%li\n", data[i]);
-//
-//        ++i;
-//    }
-//
-//    fclose(fp);
+void writeToFile(int fileIndex, char data[]) {
+    FILE *fp;
+
+    fp = fopen(fileName, "w+, ccs=UTF-8");
+
+    int i = 0;
+
+    printf("%d", i);
+
+    while (data[i] != '\0') {
+        fprintf(fp, "%i", data[i]);
+
+        ++i;
+    }
+
+    fclose(fp);
 }
