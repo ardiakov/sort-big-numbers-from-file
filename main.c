@@ -17,8 +17,75 @@ void writeToFile(char fileName[], char data[]);
 // Метод инициализирует пустые списки для сортировки по разрядам
 void initFiles();
 
+// Метод для добавления начальных нулей
+char* addLeadingZeroes(int index, char number[]);
+
+// Метод для удаления начальных нулей
+void removeLeadingZeroes();
+
+// Метод для
+void join();
+
+char *testFunc(char *number, int length) {
+    if (length == 6) {
+        return number;
+    }
+
+    char temp[6];
+    int index = 0;
+    while (*number != '\0') {
+        temp[index] = *number;
+
+        number++;
+        index++;
+    }
+
+    int i;
+    int diff = 6 - length;
+    for (i = 0; i < diff; ++i) {
+        number[i] = '0';
+    }
+
+    int j = 0;
+    for (; i < 6; ++i, ++j) {
+        number[i] = temp[j];
+    }
+
+    number[i] = '\0';
+
+    return number;
+}
+
+
 int main() {
-    FILE *file;
+    // есть char[]
+    // передать в функцию
+    // заполнить данными
+    // вернуть
+
+    char number[6] = "456";
+
+    for (int i = 0; i < sizeof(number); ++i) {
+        printf("%c", number[i]);
+    }
+
+    printf("\n");
+
+    char *pt;
+    pt = testFunc(number, 3);
+
+    printf("%s", pt);
+//
+//    while (*pt != '\0') {
+//        printf("%c", pt);
+//
+//        pt++;
+//    }
+
+
+
+
+    /*FILE *file;
     file = fopen("./simple.txt", "r");
 
     if (file == NULL) {
@@ -39,22 +106,7 @@ int main() {
         if (symbol == '\n') {
             // Если количество знаков меньше чем максимальное количество разрядов, добавляем начальные нули
             if (index < RADIX_COUNT) {
-                char temp[RADIX_COUNT];
-                for (int i = 0; i < index; i++) {
-                    temp[i] = number[i];
-                }
-
-                memset(number, 0, RADIX_COUNT);
-
-                int j;
-                for (j = 0; j < RADIX_COUNT - index; j++) {
-                    number[j] = '0';
-                }
-
-                for (int k = 0; k < index; k++) {
-                    number[j] = temp[k];
-                    j++;
-                }
+                number = addLeadingZeroes(index, number);
             }
 
             int innerRadix = RADIX_COUNT - radix;
@@ -75,7 +127,7 @@ int main() {
         index++;
     }
 
-    fclose(file);
+    fclose(file);*/
 
     return 0;
 }
