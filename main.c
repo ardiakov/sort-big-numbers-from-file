@@ -26,7 +26,7 @@ void removeLeadingZeroes();
 // Метод для
 void join();
 
-char *testFunc(char *number, int length) {
+char *addLeadingZeros(char *number, int length) {
     if (length == 6) {
         return number;
     }
@@ -39,6 +39,8 @@ char *testFunc(char *number, int length) {
         number++;
         index++;
     }
+
+    memset(number, 0, 6);
 
     int i;
     int diff = 6 - length;
@@ -56,6 +58,33 @@ char *testFunc(char *number, int length) {
     return number;
 }
 
+char *removeLeadingZeros(char *number)
+{
+    char temp[6];
+
+    int i = 0;
+    int j = 0;
+    int startNumber = 0;
+    while (*number != '\0') {
+        i++;
+        if (startNumber == 0 && number[i] == '0') {
+            continue;
+        }
+
+        startNumber = 1;
+
+        temp[j] = number[i];
+        j++;
+    }
+
+    memset(number, 0, 6);
+
+    for (int k = 0; k < 6; ++k) {
+        number[k] = temp[k];
+    }
+
+    return number;
+}
 
 int main() {
     // есть char[]
@@ -72,9 +101,12 @@ int main() {
     printf("\n");
 
     char *pt;
-    pt = testFunc(number, 3);
+    pt = addLeadingZeros(number, 3);
+    printf("%s \n", pt);
 
-    printf("%s", pt);
+    char *removeZerosPt = removeLeadingZeros(pt);
+
+    printf("%s", removeZerosPt);
 //
 //    while (*pt != '\0') {
 //        printf("%c", pt);
