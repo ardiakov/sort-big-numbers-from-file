@@ -18,7 +18,7 @@ void writeToFile(char fileName[], char data[]);
 void initFiles();
 
 // Метод для добавления начальных нулей
-char* addLeadingZeroes(int index, char number[]);
+char *addLeadingZeroes(char *number, int length);
 
 // Метод для удаления начальных нулей
 void removeLeadingZeroes();
@@ -26,12 +26,83 @@ void removeLeadingZeroes();
 // Метод для
 void join();
 
-char *addLeadingZeros(char *number, int length) {
-    if (length == 6) {
+int main() {
+    // есть char[]
+    // передать в функцию
+    // заполнить данными
+    // вернуть
+
+//    char number[6] = "456";
+//
+//    for (int i = 0; i < sizeof(number); ++i) {
+//        printf("%c", number[i]);
+//    }
+//
+//    printf("\n");
+//
+//    char *pt;
+//    pt = addLeadingZeros(number, 3);
+//    printf("%s \n", pt);
+//
+//    char *removeZerosPt = removeLeadingZeros(pt);
+//
+//    printf("%s", removeZerosPt);
+
+    FILE *file;
+    file = fopen("./simple.txt", "r");
+
+    if (file == NULL) {
+        printf("Ошибка");
+
+        return -1;
+    }
+
+    char number[RADIX_COUNT];
+    char *numberPt;
+
+    int radix = 1;
+    int countSymbolsInNumber = 0;
+
+    initFiles();
+
+    int symbol;
+    while ((symbol = fgetc(file)) != EOF) {
+        if (symbol == '\n') {
+            // Если количество знаков меньше чем максимальное количество разрядов, добавляем начальные нули
+            if (countSymbolsInNumber < RADIX_COUNT) {
+                numberPt = addLeadingZeroes(number, countSymbolsInNumber);
+            }
+
+            int innerRadix = RADIX_COUNT - radix;
+
+            // Запись числа в файл
+            char fileName[12];
+            sprintf(fileName, "./tmp/%c.txt", numberPt[innerRadix]);
+
+            printf("%s \n", numberPt);
+            writeToFile(fileName, numberPt);
+
+            memset(number, 0, RADIX_COUNT);
+            countSymbolsInNumber = 0;
+
+            continue;
+        }
+
+        number[countSymbolsInNumber] = symbol;
+        countSymbolsInNumber++;
+    }
+
+    fclose(file);
+
+    return 0;
+}
+
+char *addLeadingZeroes(char *number, int length) {
+    if (length == RADIX_COUNT) {
         return number;
     }
 
-    char temp[6];
+    char temp[RADIX_COUNT];
     int index = 0;
     while (*number != '\0') {
         temp[index] = *number;
@@ -40,16 +111,16 @@ char *addLeadingZeros(char *number, int length) {
         index++;
     }
 
-    memset(number, 0, 6);
+    memset(number, 0, RADIX_COUNT);
 
     int i;
-    int diff = 6 - length;
+    int diff = RADIX_COUNT - length;
     for (i = 0; i < diff; ++i) {
         number[i] = '0';
     }
 
     int j = 0;
-    for (; i < 6; ++i, ++j) {
+    for (; i < RADIX_COUNT; ++i, ++j) {
         number[i] = temp[j];
     }
 
@@ -86,83 +157,6 @@ char *removeLeadingZeros(char *number)
     return number;
 }
 
-int main() {
-    // есть char[]
-    // передать в функцию
-    // заполнить данными
-    // вернуть
-
-    char number[6] = "456";
-
-    for (int i = 0; i < sizeof(number); ++i) {
-        printf("%c", number[i]);
-    }
-
-    printf("\n");
-
-    char *pt;
-    pt = addLeadingZeros(number, 3);
-    printf("%s \n", pt);
-
-    char *removeZerosPt = removeLeadingZeros(pt);
-
-    printf("%s", removeZerosPt);
-//
-//    while (*pt != '\0') {
-//        printf("%c", pt);
-//
-//        pt++;
-//    }
-
-
-
-
-    /*FILE *file;
-    file = fopen("./simple.txt", "r");
-
-    if (file == NULL) {
-        printf("Ошибка");
-
-        return -1;
-    }
-
-    char number[RADIX_COUNT];
-    int symbol;
-
-    int radix = 1;
-    int index = 0;
-
-    initFiles();
-
-    while ((symbol = fgetc(file)) != EOF) {
-        if (symbol == '\n') {
-            // Если количество знаков меньше чем максимальное количество разрядов, добавляем начальные нули
-            if (index < RADIX_COUNT) {
-                number = addLeadingZeroes(index, number);
-            }
-
-            int innerRadix = RADIX_COUNT - radix;
-
-            // Запись числа в файл
-            char fileName[12];
-            sprintf(fileName, "./tmp/%c.txt", number[innerRadix]);
-
-            writeToFile(fileName, number);
-
-            memset(number, 0, RADIX_COUNT);
-            index = 0;
-
-            continue;
-        }
-
-        number[index] = symbol;
-        index++;
-    }
-
-    fclose(file);*/
-
-    return 0;
-}
 
 void initFiles() {
     FILE *fp;
@@ -179,20 +173,12 @@ void writeToFile(char fileName[], char data[]) {
     FILE *fp;
     fp = fopen(fileName, "w+, ccs=UTF-8");
 
-//    for (int l = 0; l < RADIX_COUNT; ++l) {
-//        printf("%c", data[l]);
-//    }
-//    printf("\n");
-
-    int i = 0;
-    for (int j = 0; j < RADIX_COUNT; ++j) {
+    for (int i = 0; i < RADIX_COUNT; ++i) {
         fprintf(fp, "%c", data[i]);
-
-        printf("%c", data[i]);
-        ++i;
     }
 
-    printf("\n");
-
+    printf("1");
     fclose(fp);
+
+    printf("%s rrr", data);
 }
