@@ -12,13 +12,13 @@
 void sort(long int data[]);
 
 // Метод записи отсортированных данных в файл
-void writeToFile(char fileName[], char data[]);
+void writeToFile(char *fileName, char data[]);
 
 // Метод инициализирует пустые списки для сортировки по разрядам
 void initFiles();
 
 // Метод для добавления начальных нулей
-char *addLeadingZeroes(char *number, int length);
+void addLeadingZeroes(char *number, char *tempNumber, int length);
 
 // Метод для удаления начальных нулей
 void removeLeadingZeroes();
@@ -49,7 +49,7 @@ int main() {
 //    printf("%s", removeZerosPt);
 
     FILE *file;
-    file = fopen("./simple.txt", "r");
+    file = fopen("/Users/ardiakov/CLionProjects/sort-big-numbers-from-file/simple.txt", "r+");
 
     if (file == NULL) {
         printf("Ошибка");
@@ -58,34 +58,36 @@ int main() {
     }
 
     char number[RADIX_COUNT];
-    char *numberPt;
+
+    printf("%pt \n", number);
+    char tempNumber[RADIX_COUNT];
 
     int radix = 1;
     int countSymbolsInNumber = 0;
 
     initFiles();
 
-    int symbol;
+    char symbol;
     while ((symbol = fgetc(file)) != EOF) {
         if (symbol == '\n') {
             // Если количество знаков меньше чем максимальное количество разрядов, добавляем начальные нули
             if (countSymbolsInNumber < RADIX_COUNT) {
-                numberPt = addLeadingZeroes(number, countSymbolsInNumber);
+                addLeadingZeroes(number, tempNumber, countSymbolsInNumber);
             }
 
-            int innerRadix = RADIX_COUNT - radix;
+            printf("%s \n", number);
 
-            // Запись числа в файл
-            char fileName[12];
-            sprintf(fileName, "./tmp/%c.txt", numberPt[innerRadix]);
-
-            printf("%s \n", numberPt);
-            writeToFile(fileName, numberPt);
-
-            memset(number, 0, RADIX_COUNT);
-            countSymbolsInNumber = 0;
-
-            continue;
+//
+//            int innerRadix = RADIX_COUNT - radix;
+//
+//            // Запись числа в файл
+//            char fileName[12];
+//            sprintf(fileName, "./tmp/%c.txt", number[innerRadix]);
+//            writeToFile(fileName, number);
+//            memset(number, 0, RADIX_COUNT);
+//            countSymbolsInNumber = 0;
+//
+//            continue;
         }
 
         number[countSymbolsInNumber] = symbol;
@@ -97,40 +99,39 @@ int main() {
     return 0;
 }
 
-char *addLeadingZeroes(char *number, int length) {
+void addLeadingZeroes(char *number, char *tempNumber, int length) {
+    printf("%pt \n", number);
     if (length == RADIX_COUNT) {
-        return number;
+        return;
     }
 
-    char temp[RADIX_COUNT];
     int index = 0;
     while (*number != '\0') {
-        temp[index] = *number;
+        tempNumber[index] = *number;
 
         number++;
         index++;
     }
 
-    memset(number, 0, RADIX_COUNT);
+    memset(&number, 0, RADIX_COUNT);
 
     int i;
     int diff = RADIX_COUNT - length;
-    for (i = 0; i < diff; ++i) {
-        number[i] = '0';
+    for (i = 0; i < diff; i++) {
+        number[i] = '6';
     }
 
-    int j = 0;
-    for (; i < RADIX_COUNT; ++i, ++j) {
-        number[i] = temp[j];
+    for (int j = 0; i < RADIX_COUNT; j++) {
+        number[i] = tempNumber[j];
+        i++;
     }
 
-    number[i] = '\0';
+    memset(&tempNumber, 0, RADIX_COUNT);
 
-    return number;
+    printf("%s \n", number);
 }
 
-char *removeLeadingZeros(char *number)
-{
+char *removeLeadingZeros(char *number) {
     char temp[6];
 
     int i = 0;
@@ -169,11 +170,14 @@ void initFiles() {
     }
 }
 
-void writeToFile(char fileName[], char data[]) {
+void writeToFile(char *fileName, char data[]) {
     FILE *fp;
     fp = fopen(fileName, "w+, ccs=UTF-8");
+    if (fp == NULL) {
+        printf("Ошибка");
+    }
 
-    for (int i = 0; i < RADIX_COUNT; ++i) {
+    for (int i = 0; i < RADIX_COUNT; i++) {
         fprintf(fp, "%c", data[i]);
     }
 
