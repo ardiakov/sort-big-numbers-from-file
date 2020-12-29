@@ -57,10 +57,8 @@ int main() {
         return -1;
     }
 
-    char number[RADIX_COUNT];
-
-    printf("%pt \n", number);
-    char tempNumber[RADIX_COUNT];
+    char number[RADIX_COUNT + 1];
+    char tempNumber[RADIX_COUNT + 1];
 
     int radix = 1;
     int countSymbolsInNumber = 0;
@@ -72,11 +70,16 @@ int main() {
         if (symbol == '\n') {
             // Если количество знаков меньше чем максимальное количество разрядов, добавляем начальные нули
             if (countSymbolsInNumber < RADIX_COUNT) {
+                number[countSymbolsInNumber] = '\0';
                 addLeadingZeroes(number, tempNumber, countSymbolsInNumber);
             }
 
-            printf("%s \n", number);
+            printf("str %s \n", number);
+            countSymbolsInNumber = 0;
 
+            for (int i = 0; i < RADIX_COUNT + 1; ++i) {
+                number[i] =  '\0';
+            }
 //
 //            int innerRadix = RADIX_COUNT - radix;
 //
@@ -87,7 +90,7 @@ int main() {
 //            memset(number, 0, RADIX_COUNT);
 //            countSymbolsInNumber = 0;
 //
-//            continue;
+            continue;
         }
 
         number[countSymbolsInNumber] = symbol;
@@ -100,25 +103,24 @@ int main() {
 }
 
 void addLeadingZeroes(char *number, char *tempNumber, int length) {
-    printf("%pt \n", number);
     if (length == RADIX_COUNT) {
         return;
     }
 
     int index = 0;
     while (*number != '\0') {
-        tempNumber[index] = *number;
-
-        number++;
-        index++;
+        tempNumber[index++] = *(number++);
     }
+    tempNumber[index] = '\0';
 
-    memset(&number, 0, RADIX_COUNT);
+    number[0] = '\0';
+    number[1] = '\0';
+    number[2] = '\0';
 
     int i;
     int diff = RADIX_COUNT - length;
     for (i = 0; i < diff; i++) {
-        number[i] = '6';
+        number[i] = '0';
     }
 
     for (int j = 0; i < RADIX_COUNT; j++) {
@@ -126,9 +128,11 @@ void addLeadingZeroes(char *number, char *tempNumber, int length) {
         i++;
     }
 
-    memset(&tempNumber, 0, RADIX_COUNT);
+    number[i] = '\0';
 
-    printf("%s \n", number);
+    printf("R %s \n", number);
+
+    tempNumber[0] = '\0';
 }
 
 char *removeLeadingZeros(char *number) {
