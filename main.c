@@ -4,7 +4,7 @@
 
 // Максимальное Кол-во разрядов у чисел
 #define RADIX_COUNT 2
-#define FULL_PATH_TO_SOURCE_FILE "/Users/ardiakov/CLionProjects/sort-big-numbers-from-file/%s"
+#define FULL_PATH_TO_SOURCE_FILE "/Users/ardiakov/CLionProjects/sort-big-numbers-from-file/simple.txt"
 #define FULL_PATH_TO_TMP_FILES "/Users/ardiakov/CLionProjects/sort-big-numbers-from-file/%s%c%s"
 #define FULL_PATH_TO_INIT_FILES "/Users/ardiakov/CLionProjects/sort-big-numbers-from-file/%s%d%s"
 
@@ -30,32 +30,9 @@ void removeLeadingZeroes();
 void join();
 
 int main() {
-    // есть char[]
-    // передать в функцию
-    // заполнить данными
-    // вернуть
-
-//    char number[6] = "456";
-//
-//    for (int i = 0; i < sizeof(number); ++i) {
-//        printf("%c", number[i]);
-//    }
-//
-//    printf("\n");
-//
-//    char *pt;
-//    pt = addLeadingZeros(number, 3);
-//    printf("%s \n", pt);
-//
-//    char *removeZerosPt = removeLeadingZeros(pt);
-//
-//    printf("%s", removeZerosPt);
-
     FILE *file;
-    char sourceFileName[100];
-    sprintf(sourceFileName, FULL_PATH_TO_SOURCE_FILE, "simple.txt");
 
-    file = fopen(sourceFileName, "r+");
+    file = fopen(FULL_PATH_TO_SOURCE_FILE, "r+");
 
     if (file == NULL) {
         printf("Ошибка");
@@ -75,6 +52,8 @@ int main() {
     initFiles();
 
     char symbol;
+
+    // Чтение чисел из файла и разбиение их на отдельные файлы по разрядам
     while ((symbol = fgetc(file)) != EOF) {
         if (symbol == '\n') {
             // Если количество знаков меньше чем максимальное количество разрядов, добавляем начальные нули
@@ -98,6 +77,29 @@ int main() {
     }
 
     fclose(file);
+    remove(FULL_PATH_TO_SOURCE_FILE);
+
+    // Сборка чисел из поразрадных файлов в один
+    for (int i = 0; i <= 9; ++i) {
+        FILE *fp;
+        char filename[100];
+        sprintf(filename, FULL_PATH_TO_INIT_FILES, "tmp/", i, ".txt");
+        fp = fopen(filename, "r");
+
+        while ((symbol = fgetc(fp)) != EOF) {
+            if (symbol == '\n') {
+                writeToFile(FULL_PATH_TO_SOURCE_FILE, number);
+
+                // Обнуляем
+                memset(number, 0, RADIX_COUNT);
+                countSymbolsInNumber = 0;
+            } else {
+                number[countSymbolsInNumber] = symbol;
+                countSymbolsInNumber++;
+            }
+        }
+        fclose(fp);
+    }
 
     return 0;
 }
@@ -169,7 +171,6 @@ void initFiles() {
 }
 
 void writeToFile(char *fileName, char data[]) {
-    printf("%s \n", data);
     FILE *fp;
     fp = fopen(fileName, "ab, ccs=UTF-8");
     if (fp == NULL) {
