@@ -4,6 +4,9 @@
 
 // Максимальное Кол-во разрядов у чисел
 #define RADIX_COUNT 2
+#define FULL_PATH_TO_SOURCE_FILE "/Users/ardiakov/CLionProjects/sort-big-numbers-from-file/%s"
+#define FULL_PATH_TO_TMP_FILES "/Users/ardiakov/CLionProjects/sort-big-numbers-from-file/%s%c%s"
+#define FULL_PATH_TO_INIT_FILES "/Users/ardiakov/CLionProjects/sort-big-numbers-from-file/%s%d%s"
 
 // Размер сортируемого массива ( 8 байт в 1-ом лонг инт)
 #define PARTITION_DATA_SIZE PARTITION_LIMIT * 8
@@ -49,7 +52,10 @@ int main() {
 //    printf("%s", removeZerosPt);
 
     FILE *file;
-    file = fopen("/Users/ardiakov/CLionProjects/sort-big-numbers-from-file/simple.txt", "r+");
+    char sourceFileName[100];
+    sprintf(sourceFileName, FULL_PATH_TO_SOURCE_FILE, "simple.txt");
+
+    file = fopen(sourceFileName, "r+");
 
     if (file == NULL) {
         printf("Ошибка");
@@ -63,7 +69,7 @@ int main() {
     memset(number, '\0', RADIX_COUNT + 1);
     memset(tempNumber, '\0', RADIX_COUNT + 1);
 
-    int radix = 1;
+    int currentRadix = 0;
     int countSymbolsInNumber = 0;
 
     initFiles();
@@ -76,19 +82,13 @@ int main() {
                 number[countSymbolsInNumber] = '\0';
                 addLeadingZeroes(number, tempNumber, countSymbolsInNumber);
             }
-//            for (int i = 0; i < RADIX_COUNT + 1; ++i) {
-//                number[i] =  '\0';
-//            }
 
-//            int innerRadix = RADIX_COUNT - radix;
-//
-//            // Запись числа в файл
-//            char fileName[12];
-//            sprintf(fileName, "./tmp/%c.txt", number[innerRadix]);
-//            writeToFile(fileName, number);
+            // Запись числа в файл в соответствии с их разрядом
+            char fileName[100];
+            sprintf(fileName, FULL_PATH_TO_TMP_FILES, "tmp/", number[currentRadix], ".txt");
+            writeToFile(fileName, number);
 
-            printf("%s \n", number);
-
+            // Обнуляем
             memset(number, 0, RADIX_COUNT);
             countSymbolsInNumber = 0;
         } else {
@@ -160,17 +160,18 @@ char *removeLeadingZeros(char *number) {
 void initFiles() {
     FILE *fp;
 
-    char filename[12];
+    char filename[100];
     for (int i = 0; i <= 9; ++i) {
-        sprintf(filename, "./tmp/%d.txt", i);
-        fp = fopen(filename, "w+a+");
+        sprintf(filename, FULL_PATH_TO_INIT_FILES, "tmp/", i, ".txt");
+        fp = fopen(filename, "wb+");
         fclose(fp);
     }
 }
 
 void writeToFile(char *fileName, char data[]) {
+    printf("%s \n", data);
     FILE *fp;
-    fp = fopen(fileName, "w+, ccs=UTF-8");
+    fp = fopen(fileName, "ab, ccs=UTF-8");
     if (fp == NULL) {
         printf("Ошибка");
     }
@@ -179,8 +180,7 @@ void writeToFile(char *fileName, char data[]) {
         fprintf(fp, "%c", data[i]);
     }
 
-    printf("1");
-    fclose(fp);
+    fprintf(fp, "\n");
 
-    printf("%s rrr", data);
+    fclose(fp);
 }
