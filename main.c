@@ -3,8 +3,8 @@
 #include <string.h>
 
 // Максимальное Кол-во разрядов у чисел
-#define RADIX_COUNT 2
-#define FULL_PATH_TO_SOURCE_FILE "/Users/ardiakov/CLionProjects/sort-big-numbers-from-file/simple.txt"
+#define RADIX_COUNT 10
+#define FULL_PATH_TO_SOURCE_FILE "/Users/ardiakov/CLionProjects/sort-big-numbers-from-file/test.txt"
 #define FULL_PATH_TO_TMP_FILES "/Users/ardiakov/CLionProjects/sort-big-numbers-from-file/%s%c%s"
 #define FULL_PATH_TO_INIT_FILES "/Users/ardiakov/CLionProjects/sort-big-numbers-from-file/%s%d%s"
 
@@ -30,65 +30,43 @@ void removeLeadingZeroes();
 void join();
 
 int main() {
-    FILE *file;
-
-    file = fopen(FULL_PATH_TO_SOURCE_FILE, "r+");
-
-    if (file == NULL) {
-        printf("Ошибка");
-
-        return -1;
-    }
-
     char number[RADIX_COUNT + 1];
     char tempNumber[RADIX_COUNT + 1];
 
     memset(number, '\0', RADIX_COUNT + 1);
     memset(tempNumber, '\0', RADIX_COUNT + 1);
 
-    int currentRadix = 0;
-    int countSymbolsInNumber = 0;
+    int currentRadix = RADIX_COUNT - 1;
 
-    initFiles();
+    while (currentRadix >= 0) {
+        int countSymbolsInNumber = 0;
 
-    char symbol;
+        initFiles();
 
-    // Чтение чисел из файла и разбиение их на отдельные файлы по разрядам
-    while ((symbol = fgetc(file)) != EOF) {
-        if (symbol == '\n') {
-            // Если количество знаков меньше чем максимальное количество разрядов, добавляем начальные нули
-            if (countSymbolsInNumber < RADIX_COUNT) {
-                number[countSymbolsInNumber] = '\0';
-                addLeadingZeroes(number, tempNumber, countSymbolsInNumber);
-            }
+        char symbol;
 
-            // Запись числа в файл в соответствии с их разрядом
-            char fileName[100];
-            sprintf(fileName, FULL_PATH_TO_TMP_FILES, "tmp/", number[currentRadix], ".txt");
-            writeToFile(fileName, number);
+        FILE *file;
+        file = fopen(FULL_PATH_TO_SOURCE_FILE, "r+");
 
-            // Обнуляем
-            memset(number, 0, RADIX_COUNT);
-            countSymbolsInNumber = 0;
-        } else {
-            number[countSymbolsInNumber] = symbol;
-            countSymbolsInNumber++;
+        if (file == NULL) {
+            printf("Ошибка");
+
+            return -1;
         }
-    }
 
-    fclose(file);
-    remove(FULL_PATH_TO_SOURCE_FILE);
-
-    // Сборка чисел из поразрадных файлов в один
-    for (int i = 0; i <= 9; ++i) {
-        FILE *fp;
-        char filename[100];
-        sprintf(filename, FULL_PATH_TO_INIT_FILES, "tmp/", i, ".txt");
-        fp = fopen(filename, "r");
-
-        while ((symbol = fgetc(fp)) != EOF) {
+        // Чтение чисел из файла и разбиение их на отдельные файлы по разрядам
+        while ((symbol = fgetc(file)) != EOF) {
             if (symbol == '\n') {
-                writeToFile(FULL_PATH_TO_SOURCE_FILE, number);
+                // Если количество знаков меньше чем максимальное количество разрядов, добавляем начальные нули
+                if (countSymbolsInNumber < RADIX_COUNT) {
+                    number[countSymbolsInNumber] = '\0';
+                    addLeadingZeroes(number, tempNumber, countSymbolsInNumber);
+                }
+
+                // Запись числа в файл в соответствии с их разрядом
+                char fileName[100];
+                sprintf(fileName, FULL_PATH_TO_TMP_FILES, "tmp/", number[currentRadix], ".txt");
+                writeToFile(fileName, number);
 
                 // Обнуляем
                 memset(number, 0, RADIX_COUNT);
@@ -98,7 +76,32 @@ int main() {
                 countSymbolsInNumber++;
             }
         }
-        fclose(fp);
+
+        fclose(file);
+        remove(FULL_PATH_TO_SOURCE_FILE);
+
+        // Сборка чисел из поразрадных файлов в один
+        for (int i = 0; i <= 9; ++i) {
+            char filename[100];
+            sprintf(filename, FULL_PATH_TO_INIT_FILES, "tmp/", i, ".txt");
+            file = fopen(filename, "r");
+
+            while ((symbol = fgetc(file)) != EOF) {
+                if (symbol == '\n') {
+                    writeToFile(FULL_PATH_TO_SOURCE_FILE, number);
+
+                    // Обнуляем
+                    memset(number, 0, RADIX_COUNT);
+                    countSymbolsInNumber = 0;
+                } else {
+                    number[countSymbolsInNumber] = symbol;
+                    countSymbolsInNumber++;
+                }
+            }
+            fclose(file);
+        }
+
+        currentRadix--;
     }
 
     return 0;
