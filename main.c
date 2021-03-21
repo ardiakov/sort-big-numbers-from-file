@@ -1,18 +1,11 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 // Максимальное Кол-во разрядов у чисел
 #define RADIX_COUNT 10
-#define FULL_PATH_TO_SOURCE_FILE "/Users/ardiakov/CLionProjects/sort-big-numbers-from-file/test.txt"
+#define FULL_PATH_TO_SOURCE_FILE "/Users/ardiakov/CLionProjects/sort-big-numbers-from-file/test2.txt"
 #define FULL_PATH_TO_TMP_FILES "/Users/ardiakov/CLionProjects/sort-big-numbers-from-file/%s%c%s"
 #define FULL_PATH_TO_INIT_FILES "/Users/ardiakov/CLionProjects/sort-big-numbers-from-file/%s%d%s"
-
-// Размер сортируемого массива ( 8 байт в 1-ом лонг инт)
-#define PARTITION_DATA_SIZE PARTITION_LIMIT * 8
-
-// Метод сортировки данных
-void sort(long int data[]);
 
 // Метод записи отсортированных данных в файл
 void writeToFile(char *fileName, char data[]);
@@ -22,12 +15,6 @@ void initFiles();
 
 // Метод для добавления начальных нулей
 void addLeadingZeroes(char *number, char *tempNumber, int length);
-
-// Метод для удаления начальных нулей
-void removeLeadingZeroes();
-
-// Метод для
-void join();
 
 int main() {
     char number[RADIX_COUNT + 1];
